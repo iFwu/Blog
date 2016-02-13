@@ -334,7 +334,53 @@ love.addEventListener('click', function ( e ) {
 
 实现了和上一个例子中一样的效果。但是却有效的控制了DOM访问次数，事件处理程序的添加个数，以及DOM元素与相应的事件处理程序的连接次数。
 
+###移除事件处理程序
+>利用事件委托我们可以有效的控制相应的事件处理程序与指定元素的连接次数。另外，在不需要的时候移除事件处理程序，也是解决这个问题的一种方案。内存中留有那些过时不用的"空事件处理程序，也是造成Web应用程序内存和性能问题的主要原因"。
 
+有两种情况可能导致上述问题
+1. 带有事件处理程序的 **指定元素** 通过DOM操作被删除了，页面中的某一部分被替换了，导致带有事件处理程序的 **指定元素** 被删除了。
+2. 卸载页面的时候。
+ 
+**第一种情况:**本质上来讲都是一种情况，就是带有事件处理程序的 **指定元素**被删除了，但是其事件处理程序仍然和 **指定元素**保持着引用关系，导致其事件处理程序无法被当做垃圾回收。(尤其是IE)会做出这种处理
+
+```
+<div id="myDiv">
+    <div id="myBtn"></div>
+</div>
+var handler = function () {
+    // 删除指定元素
+    document.getElementById( 'myDiv' ).removeChild();
+}
+
+var btn = document.getElementById('myBtn');
+
+btn.addEventListener('click', handler, false);
+```
+
+点击按钮时，按钮被删除，但是其事件处理程序却还和其保持了引用关系,导致内存增加。因此在知道 **指定元素**可能被删除的情况下，先解除他们之间的引用关系。如下
+
+```
+<div id="myDiv">
+    <div id="myBtn"></div>
+</div>
+var handler = function () {
+    // 解除连接引用关系
+    btn.removeEventListener( 'click', handler, false );
+
+    // 删除指定元素
+    document.getElementById( 'myDiv' ).removeChild();
+}
+
+var btn = document.getElementById('myBtn');
+
+btn.addEventListener('click', handler, false);
+```
+
+这样通过解除引用连接关系，也可以提升页面性能。
+
+**第二种情况:**IE8及更早浏览器在这种情况下仍然是问题最多的浏览器。如果在页面卸载之前，没有清理干净事件处理程序，那它们就会滞留在事件处理程序中。
+
+一般来说，最好的做法是在页面卸载之前，先通过unload事件处理程序移除所有事件处理程序。
 
 
 
