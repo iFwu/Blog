@@ -256,6 +256,52 @@ document.body.onclick = function () {
 };
 ```
 
+
+事件类型
+-------------
+>DOM3级事件模块在DOM2级事件模块基础上重新定义了这些事件，也添加了一些新事件。包括IE9在内的所有主流浏览器都支持DOM2级事件。IE9也支持DOM3级事件。 
+
+###HTML5事件
++ DOMContentLoaded : 
+  1. 可以为document和window添加相应的事件处理程序(尽管这个事件会冒泡到window，但它的目标实际上是document)。
+  2. DOMContentLoaded中的`event对象`不会提供额外的信息(其target属性是document)
+**兼容性:**IE9+,Fifrefox,Chrome,Safari3.1+,Opera9+。
+
++ hashchange : 
+  1. 必须要把hashchange事件处理程添加给`window对象`，然后URL参数列表只要变化就会调用它。
+  2. 此时的`event对象`应该额外包含两个属性:oldURL和newURL。这两个属性分别保存着参数列表变化前后的完整URL。
+**兼容性:**IE8+，firefox3.6+,Safari5+,Chrome,Opera10.6+。在这些浏览器中只有Firefox6+,chrome和Opera支持oldURL和newURL属性。为此，最好是使用location对象来确定当前的参数列表。
+
+###键盘事件
++ keydown(任意键),keypress(字符键), keyup
+
+>发生keypress事件意味着按下的键会影响到屏幕中文本的显示。在所有浏览器中，按下能够插入或者删除字符的键都会触发keypress事件。
+   
+   1. 所有元素都支持以上三个事件,但只有在用户通过文本框输入文本时才最常用到
+   2. 触发顺序:在用户按下了一个字符键时，keydown-->keypress-->keyup。在用户按下的是一个非字符键，keydown-->keyup。
+   3. `event对象`
+     + shiftKey,ctrlKey,altKey和metaKey属性。
+     + 在发生keydown和keyup事件时，`event对象`的keyCode属性会包含一个键码。          
+**兼容性:**IE不支持metaKey。                                                                                                                    
+
+###鼠标事件
++ mousedown,mouseup
++ click,dbclick
+   1. 所有元素都支持鼠标事件。
+   2. 触发顺序:mousedown-->mouseup-->click-->mousedown-->mouseup-->click--dbclick。在IE8以及之前版本，有一个小bug，会跳过第二个mousedown和click
+   3. event对象:
+      + clientX和clientY:表示事件发生时，鼠标指针在视口中的水平和垂直坐标
+      + PageX和PageY:表示鼠标光标在页面中的位置，因此坐标是从页面本身，而非视口的左边和顶边计算的。
+      + screenX和screenY:可以确定鼠标事件发生时，鼠标指针相对于整个屏幕的坐标信息。
+      + shiftKey,ctrlKey,altKey和metaKey属性。
+      + mousedown和mouseup事件，还包括一个button属性:表示按下或释放的按钮DOM的button属性可能有如下3个值，0表示主鼠标按钮，1表示中间的鼠标按钮，2表示次鼠标按钮。
+**兼容性:**
++ IE8以及更早版本不支持事件对象上的页面坐标，不过使用客户区坐标和滚动信息可以计算出来。
++ IE8以及更早版本不支持metaKey属性。
+
++ touchstart
+
+
 内存和性能
 ------------
 ###事件处理程序对性能的影响
